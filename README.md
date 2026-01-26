@@ -6,7 +6,7 @@ made by Phönix
 
 **HOW TO USE:**
 1. Install Python 3.13 from the Microsoft Store
-	→ (https://apps.microsoft.com/detail/9PNRBTZXMB4Z?hl=neutral&gl=DE&ocid=pdpshare)
+		→ (https://apps.microsoft.com/detail/9PNRBTZXMB4Z?hl=neutral&gl=DE&ocid=pdpshare)
 2. Run assets.bat
 3. Wait until everything is installed
 4. Run MyHud.exe
