@@ -1,65 +1,35 @@
 @echo off
-echo Installing required Python packages...
-
-python.exe -m pip install --upgrade pip
-
-pip install --upgrade pip
-if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von Pip.
-) else (
-    echo Pip wurde erfolgreich geupdateted.
-)
-
+echo ================================
+echo Installing required Python packages
+echo ================================
 echo.
 
-pip install customtkinter
+REM Upgrade pip
+python -m pip install --upgrade pip
 if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von customtkinter.
-) else (
-    echo customtkinter wurde erfolgreich installiert.
+    echo Fehler beim Aktualisieren von pip.
+    pause
+    exit /b
 )
 
+echo Pip erfolgreich aktualisiert.
 echo.
 
-pip install pywin32
-if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von pywin32.
-) else (
-    echo pywin32 wurde erfolgreich installiert.
+REM List of required packages
+set PACKAGES=customtkinter pywin32 psutil pynput Pillow
+
+for %%P in (%PACKAGES%) do (
+    echo Installing %%P ...
+    python -m pip install %%P
+    if %errorlevel% neq 0 (
+        echo Fehler bei der Installation von %%P
+    ) else (
+        echo %%P erfolgreich installiert.
+    )
+    echo.
 )
 
-echo.
-
-
-pip install psutil
-if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von psutil.
-) else (
-    echo psutil wurde erfolgreich installiert.
-)
-
-echo.
-
-
-pip install keyboard
-if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von keyboard.
-) else (
-    echo keyboard wurde erfolgreich installiert.
-)
-
-echo.
-
-pip install Pillow
-if %errorlevel% neq 0 (
-    echo Fehler bei der Installation von Pillow.
-) else (
-    echo Pillow wurde erfolgreich installiert.
-)
-
-echo.
-
-
-
-echo All dependencies installed successfully!
+echo ================================
+echo All dependencies processed.
+echo ================================
 pause
