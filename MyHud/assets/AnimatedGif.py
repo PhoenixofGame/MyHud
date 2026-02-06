@@ -3,21 +3,21 @@ from PIL import Image, ImageTk
 
 class AnimatedGIF:
     def __init__(
-        self,
-        canvas,
-        gif_path,
-        x,
-        y,
-        width=None,
-        height=None,
-        anchor="center",
+            self,
+            canvas,
+            gif_path,
+            x,
+            y,
+            width=None,
+            height=None,
+            anchor="center",
 
     ):
         """
         canvas : Tkinter Canvas
-        gif_path : Pfad zur GIF-Datei
+        gif_path : Pfad zur GIF-Datei oder statischem Bild (PNG, JPG, etc.)
         x, y : Position auf dem Canvas
-        width, height : gewünschte GIF-Größe (optional)
+        width, height : gewünschte Bild-Größe (optional)
         anchor : Canvas-Anker (default: center)
         """
 
@@ -31,35 +31,58 @@ class AnimatedGIF:
         self.running = False
         self.after_id = None
         self.current_frame = 0
+        self.is_animated = False  # NEU: Flag für animierte vs. statische Bilder
 
-        # GIF laden
+        # Bild laden
         self.pil_image = Image.open(gif_path)
         self.frames = []
         self.photo_images = []
 
-        # Alle Frames laden
+        # Prüfen ob es ein animiertes GIF ist
         try:
-            while True:
-                frame = self.pil_image.copy().convert("RGBA")
-
-                # Größe ändern, falls angegeben
-                if self.width and self.height:
-                    frame = frame.resize(
-                        (self.width, self.height),
-                        Image.Resampling.LANCZOS
-                    )
-
-                self.frames.append(frame)
-                self.pil_image.seek(len(self.frames))
+            self.pil_image.seek(1)
+            self.is_animated = True
+            self.pil_image.seek(0)
         except EOFError:
-            pass
+            self.is_animated = False
 
-        if not self.frames:
-            raise ValueError("Keine Frames im GIF gefunden")
+        if self.is_animated:
+            # Alle Frames laden (für animierte GIFs)
+            try:
+                while True:
+                    frame = self.pil_image.copy().convert("RGBA")
 
-        # Delay aus GIF lesen
-        self.pil_image.seek(0)
-        self.delay = self.pil_image.info.get("duration", 100)
+                    # Größe ändern, falls angegeben
+                    if self.width and self.height:
+                        frame = frame.resize(
+                            (self.width, self.height),
+                            Image.Resampling.LANCZOS
+                        )
+
+                    self.frames.append(frame)
+                    self.pil_image.seek(len(self.frames))
+            except EOFError:
+                pass
+
+            if not self.frames:
+                raise ValueError("Keine Frames im GIF gefunden")
+
+            # Delay aus GIF lesen
+            self.pil_image.seek(0)
+            self.delay = self.pil_image.info.get("duration", 100)
+        else:
+            # Statisches Bild (PNG, JPG, etc.)
+            frame = self.pil_image.convert("RGBA")
+
+            # Größe ändern, falls angegeben
+            if self.width and self.height:
+                frame = frame.resize(
+                    (self.width, self.height),
+                    Image.Resampling.LANCZOS
+                )
+
+            self.frames.append(frame)
+            self.delay = 0  # Kein Delay bei statischen Bildern
 
         # Ersten Frame erzeugen
         first_photo = ImageTk.PhotoImage(
@@ -77,14 +100,15 @@ class AnimatedGIF:
             anchor=self.anchor
         )
 
-        # Starten
-        self.start()
+        # Nur starten wenn animiert
+        if self.is_animated:
+            self.start()
 
     # -------------------------------------------------
     # Animation
     # -------------------------------------------------
     def animate(self):
-        if not self.running:
+        if not self.running or not self.is_animated:
             return
 
         frame_index = self.current_frame % len(self.frames)
@@ -108,7 +132,7 @@ class AnimatedGIF:
     # Steuerung
     # -------------------------------------------------
     def start(self):
-        if not self.running:
+        if not self.running and self.is_animated:
             self.running = True
             self.animate()
 
@@ -133,7 +157,7 @@ class AnimatedGIF:
     # -------------------------------------------------
     def resize(self, width, height):
         """
-        GIF-Größe zur Laufzeit ändern
+        Bild-Größe zur Laufzeit ändern
         """
         self.width = width
         self.height = height
@@ -142,19 +166,30 @@ class AnimatedGIF:
         self.photo_images.clear()
         self.current_frame = 0
 
-        self.pil_image.seek(0)
+        if self.is_animated:
+            # Für animierte GIFs
+            self.pil_image.seek(0)
 
-        try:
-            while True:
-                frame = self.pil_image.copy().convert("RGBA")
-                frame = frame.resize(
-                    (self.width, self.height),
-                    Image.Resampling.LANCZOS
-                )
-                self.frames.append(frame)
-                self.pil_image.seek(len(self.frames))
-        except EOFError:
-            pass
+            try:
+                while True:
+                    frame = self.pil_image.copy().convert("RGBA")
+                    frame = frame.resize(
+                        (self.width, self.height),
+                        Image.Resampling.LANCZOS
+                    )
+                    self.frames.append(frame)
+                    self.pil_image.seek(len(self.frames))
+            except EOFError:
+                pass
+        else:
+            # Für statische Bilder
+            self.pil_image.seek(0)
+            frame = self.pil_image.convert("RGBA")
+            frame = frame.resize(
+                (self.width, self.height),
+                Image.Resampling.LANCZOS
+            )
+            self.frames.append(frame)
 
         # Ersten Frame neu setzen
         first_photo = ImageTk.PhotoImage(

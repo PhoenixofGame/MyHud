@@ -1,82 +1,118 @@
 import tkinter as tk
-import json
 import win32gui
 import win32con
 import colorsys
 import os
 import sys
 
-# Absoluter Pfad zum Ordner, in dem das aktuell laufende Skript liegt
-script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+from ConfigManager import ConfigManager
 
-# Arbeitsverzeichnis auf diesen Pfad setzen
-os.chdir(script_dir)
-
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-cross_config_path = os.path.join(BASE_DIR, "assets", "config.json")
-activation_config_path = os.path.join(BASE_DIR, "assets", "config.json")
-
+os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 try:
-    with open(cross_config_path, 'r') as f: # läd variablen
-        daten = json.load(f)
+    dot_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_color")
+    dot_outline = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_outline")
+    dot_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_size")
+    rectangle_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_color")
+    rectangle_outline = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_outline")
+    rectangle_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_size")
+    x_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="x_color")
+    x_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="x_size")
+    x_gap = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="x_gap")
+    x_width = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="x_width")
+    plus_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="plus_color")
+    plus_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="plus_size")
+    plus_gap = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="plus_gap")
+    plus_width = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="plus_width")
+    triangle_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="triangle_color")
+    triangle_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="triangle_size")
+    triangle_width = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="triangle_width")
+    dot_activation = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_activation")
+    rectangle_activation = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_activation")
+    plus_activation = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="plus_activation")
+    x_activation = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="x_activation")
+    triangle_activation = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="triangle_activation")
 
-    CrossDoTFarbe = daten["CrossDoTFarbe"]
-    CrossDoTOutline = daten["CrossDoTOutline"]
-    CrossDoTGrose = daten["CrossDoTGrose"]
-    CrossEckFarbe = daten["CrossEckFarbe"]
-    CrossEckOutline = daten["CrossEckOutline"]
-    CrossEckGrose = daten["CrossEckGrose"]
-    CrossXFarbe = daten["CrossXFarbe"]
-    CrossXGrose = daten["CrossXGrose"]
-    CrossXGap = daten["CrossXGap"]
-    CrossPFarbe = daten["CrossPFarbe"]
-    CrossPGrose = daten["CrossPGrose"]
-    CrossPGap = daten["CrossPGap"]
-    CrossDreiFarbe = daten["CrossDreiFarbe"]
-    CrossDreiGrose = daten["CrossDreiGrose"]
-
-except FileNotFoundError: # default Variablen falls config.json nicht exestiert
-    CrossDoTFarbe = "white"
-    CrossDoTOutline = "blue"
-    CrossDoTGrose = 2.5
-    CrossEckFarbe = "white"
-    CrossEckOutline = "black"
-    CrossEckGrose = 2.5
-    CrossXFarbe = "blue"
-    CrossXGrose = 2.5
-    CrossXGap = 2.5
-    CrossPFarbe = "white"
-    CrossPGrose = 2.5
-    CrossPGap = 2.5
-    CrossDreiFarbe = "white"
-    CrossDreiGrose = 2.5
-
-try:
-    with open(activation_config_path, 'r') as f: # läd variablen
-        daten = json.load(f)
-    DoTActivation = daten["DoTActivation"]
-    EckActivation = daten["EckActivation"]
-    PActivation = daten["PActivation"]
-    XActivation = daten["XActivation"]
-    DreiActivation = daten["DreiActivation"]
+except ValueError:
+    print("Value Error")
+    dot_color = "white"
+    dot_outline = "blue"
+    dot_size = 2.5
+    rectangle_color = "white"
+    rectangle_outline = "black"
+    rectangle_size = 2.5
+    x_color = "blue"
+    x_size = 2.5
+    x_gap = 2.5
+    x_width = 2.0
+    plus_color = "white"
+    plus_size = 2.5
+    plus_gap = 2.5
+    plus_width = 2.0
+    triangle_color = "white"
+    triangle_size = 2.5
+    triangle_width = 5.0
+    dot_activation = False
+    rectangle_activation = False
+    plus_activation = False
+    x_activation = False
+    triangle_activation = False
 
 except FileNotFoundError:
-    DoTActivation = False
-    EckActivation = False
-    PActivation = False
-    XActivation = False
-    DreiActivation = False
-    print ("Err")
+    print("Config Not Found Error")
+    dot_color = "white"
+    dot_outline = "blue"
+    dot_size = 2.5
+    rectangle_color = "white"
+    rectangle_outline = "black"
+    rectangle_size = 2.5
+    x_color = "blue"
+    x_size = 2.5
+    x_gap = 2.5
+    x_width = 2.0
+    plus_color = "white"
+    plus_size = 2.5
+    plus_gap = 2.5
+    plus_width = 2.0
+    triangle_color = "white"
+    triangle_size = 2.5
+    triangle_width = 5.0
+    dot_activation = False
+    rectangle_activation = False
+    plus_activation = False
+    x_activation = False
+    triangle_activation = False
 
+    backup_data = {
+        "dot_color": "white",
+        "dot_outline": "blue",
+        "dot_size": 2.5,
+        "rectangle_color": "white",
+        "rectangle_outline": "black",
+        "rectangle_size": 2.5,
+        "x_color": "blue",
+        "x_size": 2.5,
+        "x_gap": 2.5,
+        "x_width": 2.0,
+        "plus_color": "white",
+        "plus_size": 2.5,
+        "plus_gap": 2.5,
+        "plus_width": 2.0,
+        "triangle_color": "white",
+        "triangle_size": 2.5,
+        "triangle_width": 5.0,
+        "dot_activation": False,
+        "rectangle_activation": False,
+        "plus_activation": False,
+        "x_activation": False,
+        "triangle_activation": False
+    }
+    ConfigManager().create_and_save(data= backup_data, config_name= "crosshair_config.json")
 
 toast = tk.Tk()
 toast.title("CrosshairOverlay")
 toast.attributes("-topmost", True)
 toast.update()
-
 
 toast.attributes("-transparentcolor", "#000001")  # Transparent background
 toast.overrideredirect(True)  # Remove window border
@@ -93,295 +129,186 @@ screen_width = toast.winfo_screenwidth()
 screen_height = toast.winfo_screenheight()
 toast.geometry(f"{screen_width}x{screen_height}+0+0")
 
-
 canvas = tk.Canvas(toast, width=screen_width, height=screen_height, bg="#000001", highlightthickness=0,)
 canvas.pack()
 
-
-if DoTActivation == True:
-    if CrossDoTFarbe != "rgb" and CrossDoTOutline != "rgb":
-        # kreis crs
-        canvas.create_oval(screen_width//2 - CrossDoTGrose,
-                           screen_height//2 - CrossDoTGrose,
-                           screen_width//2 + CrossDoTGrose,
-                           screen_height//2 + CrossDoTGrose,
-                           fill= CrossDoTFarbe, outline=CrossDoTOutline)
-
-    elif CrossDoTFarbe == "rgb" and CrossDoTOutline == "rgb":
-        txcolordot = []
+class Crosshair:
+    def __init__(self):
+        # RGB-Farbpalette einmal erstellen
+        self.rgb_colors = []
         for i in range(360):
             h = i / 360.0
             r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolordot.append('#{0:02X}{1:02X}{2:02X}'.format(
+            self.rgb_colors.append('#{0:02X}{1:02X}{2:02X}'.format(
                 int(r * 255), int(g * 255), int(b * 255)
             ))
-        index_dot = 0
-        def update_color_dot():
-            global index_dot
-            TextColor = txcolordot[index_dot]
-            canvas.itemconfig(mot_id_dot, fill=TextColor, outline=TextColor)
-            index_dot = (index_dot + 1) % len(txcolordot)
-            toast.after(16, update_color_dot)
 
-        mot_id_dot = canvas.create_oval(screen_width//2 - CrossDoTGrose,
-                                        screen_height//2 - CrossDoTGrose,
-                                        screen_width//2 + CrossDoTGrose,
-                                        screen_height//2 + CrossDoTGrose,
-                                        fill= "white", outline="white")
-        update_color_dot()
+    def create_dot(self, main_color, outline_color, size):
+        # Bestimme Anfangsfarben
+        initial_fill = "white" if main_color == "rgb" else main_color
+        initial_outline = "white" if outline_color == "rgb" else outline_color
 
-    elif CrossDoTFarbe == "rgb":
-        txcolordot = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolordot.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_dot = 0
-        def update_color_dot():
-            global index_dot
-            TextColor = txcolordot[index_dot]
-            canvas.itemconfig(mot_id_dot, fill=TextColor)
-            index_dot = (index_dot + 1) % len(txcolordot)
-            toast.after(16, update_color_dot)
+        # Erstelle den Dot
+        simpel_dot = canvas.create_oval(
+            screen_width // 2 - size,
+            screen_height // 2 - size,
+            screen_width // 2 + size,
+            screen_height // 2 + size,
+            fill=initial_fill,
+            outline=initial_outline
+        )
 
-        mot_id_dot = canvas.create_oval(screen_width//2 - CrossDoTGrose,
-                                        screen_height//2 - CrossDoTGrose,
-                                        screen_width//2 + CrossDoTGrose,
-                                        screen_height//2 + CrossDoTGrose,
-                                        fill= "white", outline=CrossDoTOutline)
-        update_color_dot()
+        # Nur wenn RGB benötigt wird, starte Animation
+        if main_color == "rgb" or outline_color == "rgb":
+            index_dot = 0
 
-    elif CrossDoTOutline == "rgb":
-        txcolordot = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolordot.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_dot = 0
-        def update_color_dot():
-            global index_dot
-            TextColor = txcolordot[index_dot]
-            canvas.itemconfig(mot_id_dot, outline=TextColor)
-            index_dot = (index_dot + 1) % len(txcolordot)
-            toast.after(16, update_color_dot)
+            def update_color_dot():
+                nonlocal index_dot
+                color = self.rgb_colors[index_dot]
 
-        mot_id_dot = canvas.create_oval(screen_width//2 - CrossDoTGrose,
-                                        screen_height//2 - CrossDoTGrose,
-                                        screen_width//2 + CrossDoTGrose,
-                                        screen_height//2 + CrossDoTGrose,
-                                        fill= CrossDoTFarbe, outline="white")
-        update_color_dot()
+                if main_color == "rgb":
+                    canvas.itemconfig(simpel_dot, fill=color)
+                if outline_color == "rgb":
+                    canvas.itemconfig(simpel_dot, outline=color)
 
-else:
-    pass
+                index_dot = (index_dot + 1) % len(self.rgb_colors)
+                toast.after(16, update_color_dot)
 
-if EckActivation == True:
-    if CrossEckFarbe != "rgb" and CrossEckOutline != "rgb":
-        # viereck crs
-        canvas.create_rectangle(
-            screen_width//2 - CrossEckGrose, screen_height//2 - CrossEckGrose,
-            screen_width//2 + CrossEckGrose, screen_height//2 + CrossEckGrose,
-            fill=CrossEckFarbe, outline=CrossEckOutline)
+            update_color_dot()
 
-    elif CrossEckFarbe == "rgb" and CrossEckOutline == "rgb":
-        txcoloreck = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcoloreck.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_eck = 0
-        def update_color_eck():
-            global index_eck
-            TextColor = txcoloreck[index_eck]
-            canvas.itemconfig(mot_id_eck, fill=TextColor, outline=TextColor)
-            index_eck = (index_eck + 1) % len(txcoloreck)
-            toast.after(16, update_color_eck)
+    def create_rectangle(self, main_color, outline_color, size):
+        initial_fill = "white" if main_color == "rgb" else main_color
+        initial_outline = "white" if outline_color == "rgb" else outline_color
 
-        mot_id_eck = canvas.create_rectangle(screen_width//2 - CrossEckGrose, screen_height//2 - CrossEckGrose,
-                                             screen_width//2 + CrossEckGrose, screen_height//2 + CrossEckGrose,
-                                            fill="white", outline="white")
-        update_color_eck()
+        simple_rectangle = canvas.create_rectangle(
+            screen_width//2 - size,
+            screen_height//2 - size,
+            screen_width//2 + size,
+            screen_height//2 + size,
+            fill=initial_fill, outline=initial_outline
+        )
 
-    elif CrossEckFarbe == "rgb":
-        txcoloreck = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcoloreck.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_eck = 0
-        def update_color_eck():
-            global index_eck
-            TextColor = txcoloreck[index_eck]
-            canvas.itemconfig(mot_id_eck, fill=TextColor)
-            index_eck = (index_eck + 1) % len(txcoloreck)
-            toast.after(16, update_color_eck)
+        if main_color == "rgb" or outline_color == "rgb":
+            index_dot = 0
 
-        mot_id_eck = canvas.create_rectangle(screen_width//2 - CrossEckGrose, screen_height//2 - CrossEckGrose,
-                                             screen_width//2 + CrossEckGrose, screen_height//2 + CrossEckGrose,
-                                            fill="white", outline=CrossEckOutline)
-        update_color_eck()
+            def update_color_dot():
+                nonlocal index_dot
+                color = self.rgb_colors[index_dot]
 
-    elif CrossEckOutline == "rgb":
-        txcoloreck = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcoloreck.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_eck = 0
+                if main_color == "rgb":
+                    canvas.itemconfig(simple_rectangle, fill=color)
+                if outline_color == "rgb":
+                    canvas.itemconfig(simple_rectangle, outline=color)
+
+                index_dot = (index_dot + 1) % len(self.rgb_colors)
+                toast.after(16, update_color_dot)
+
+            update_color_dot()
 
 
-        def update_color_eck():
-            global index_eck
-            TextColor = txcoloreck[index_eck]
-            canvas.itemconfig(mot_id_eck, outline=TextColor)
-            index_eck = (index_eck + 1) % len(txcoloreck)
-            toast.after(16, update_color_eck)
+    def create_x(self, main_color, size, gap_size, width):
+        initial_fill = "white" if main_color == "rgb" else main_color
 
-
-        mot_id_eck = canvas.create_rectangle(screen_width // 2 - CrossEckGrose, screen_height // 2 - CrossEckGrose,
-                                             screen_width // 2 + CrossEckGrose, screen_height // 2 + CrossEckGrose,
-                                             fill=CrossEckFarbe, outline="white")
-        update_color_eck()
-
-
-else:
-    pass
-
-if XActivation == True:
-    if CrossXFarbe != "rgb":
-        kombiniertX = CrossXGrose + CrossXGap
+        combine = size + gap_size
         # X crs
-        canvas.create_line(screen_width//2 + CrossXGap, screen_height//2 + CrossXGap, screen_width//2 + kombiniertX, screen_height//2 + kombiniertX, fill=CrossXFarbe, width=2) # RECHTSHOCH
-        canvas.create_line(screen_width//2 - CrossXGap, screen_height//2 + CrossXGap, screen_width//2 - kombiniertX, screen_height//2 + kombiniertX, fill=CrossXFarbe, width=2) # linkshoch
-        canvas.create_line(screen_width//2 + CrossXGap, screen_height//2 - CrossXGap, screen_width//2 + kombiniertX, screen_height//2 - kombiniertX, fill=CrossXFarbe ,width=2) # rechtsrunter
-        canvas.create_line(screen_width//2 - CrossXGap, screen_height//2 - CrossXGap, screen_width//2 - kombiniertX, screen_height//2 - kombiniertX, fill=CrossXFarbe ,width=2) # linksrunter
+        x_lines = [
+            canvas.create_line(screen_width//2 + gap_size, screen_height//2 + gap_size, screen_width//2 + combine, screen_height//2 + combine, fill=initial_fill, width=width), # RECHTS HOCH
+            canvas.create_line(screen_width//2 - gap_size, screen_height//2 + gap_size, screen_width//2 - combine, screen_height//2 + combine, fill=initial_fill, width=width), # LINKS HOCH
+            canvas.create_line(screen_width//2 + gap_size, screen_height//2 - gap_size, screen_width//2 + combine, screen_height//2 - combine, fill=initial_fill ,width=width), # RECHTS RUNTER
+            canvas.create_line(screen_width//2 - gap_size, screen_height//2 - gap_size, screen_width//2 - combine, screen_height//2 - combine, fill=initial_fill ,width=width) # LINKS RUNTER
+        ]
 
-    elif CrossXFarbe == "rgb":
-        kombiniertX = CrossXGrose + CrossXGap
-        txcolorx = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolorx.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_x = 0
-        def update_color_x():
-            global index_x
-            TextColor = txcolorx[index_x]
-            canvas.itemconfig(mot_id_x1, fill=TextColor)
-            canvas.itemconfig(mot_id_x2, fill=TextColor)
-            canvas.itemconfig(mot_id_x3, fill=TextColor)
-            canvas.itemconfig(mot_id_x4, fill=TextColor)
-            index_x = (index_x + 1) % len(txcolorx)
-            toast.after(16, update_color_x)
+        if main_color == "rgb":
+            index_dot = 0
 
-        mot_id_x1 = canvas.create_line(screen_width//2 + CrossXGap, screen_height//2 + CrossXGap, screen_width//2 + kombiniertX, screen_height//2 + kombiniertX, fill="white", width=2) # RECHTSHOCH
-        mot_id_x2 = canvas.create_line(screen_width//2 - CrossXGap, screen_height//2 + CrossXGap, screen_width//2 - kombiniertX, screen_height//2 + kombiniertX, fill="white", width=2) # linkshoch
-        mot_id_x3 = canvas.create_line(screen_width//2 + CrossXGap, screen_height//2 - CrossXGap, screen_width//2 + kombiniertX, screen_height//2 - kombiniertX, fill="white", width=2) # rechtsrunter
-        mot_id_x4 = canvas.create_line(screen_width//2 - CrossXGap, screen_height//2 - CrossXGap, screen_width//2 - kombiniertX, screen_height//2 - kombiniertX, fill="white", width=2) # linksrunter
+            def update_color():
+                nonlocal index_dot
+                color = self.rgb_colors[index_dot]
 
-        update_color_x()
+                # Alle Linien auf einmal updaten
+                for line in x_lines:
+                    canvas.itemconfig(line, fill=color)
 
-else:
-    pass
+                index_dot = (index_dot + 1) % len(self.rgb_colors)
+                toast.after(16, update_color)
 
-if PActivation == True:
-    if CrossPFarbe != "rgb":
-        kombiniert = CrossPGrose + CrossPGap
-        # + crs
-        canvas.create_line(screen_width//2 - CrossPGap, screen_height//2, screen_width//2 - kombiniert, screen_height//2, fill=CrossPFarbe, width=2) # links
-        canvas.create_line(screen_width//2, screen_height//2 - CrossPGap, screen_width//2, screen_height//2 - kombiniert, fill=CrossPFarbe, width=2) # runter
-        canvas.create_line(screen_width//2 + CrossPGap, screen_height//2, screen_width//2 + kombiniert, screen_height//2, fill=CrossPFarbe, width=2) # rechts
-        canvas.create_line(screen_width//2, screen_height//2 + CrossPGap, screen_width//2, screen_height//2 + kombiniert, fill=CrossPFarbe, width=2) # hoch
+            update_color()
+
+    def create_plus(self, main_color, size, gap_size, width):
+        initial_fill = "white" if main_color == "rgb" else main_color
+
+        combine = size + gap_size
+
+        #plus
+        plus_lines = [
+            canvas.create_line(screen_width//2 - gap_size, screen_height//2, screen_width//2 - combine, screen_height//2, fill=initial_fill, width=width), # links
+            canvas.create_line(screen_width//2, screen_height//2 - gap_size, screen_width//2, screen_height//2 - combine, fill=initial_fill, width=width), # runter
+            canvas.create_line(screen_width//2 + gap_size, screen_height//2, screen_width//2 + combine, screen_height//2, fill=initial_fill, width=width), # rechts
+            canvas.create_line(screen_width//2, screen_height//2 + gap_size, screen_width//2, screen_height//2 + combine, fill=initial_fill, width=width) # hoch
+        ]
+
+        if main_color == "rgb":
+            index_dot = 0
+
+            def update_color():
+                nonlocal index_dot
+                color = self.rgb_colors[index_dot]
+
+                # Alle Linien auf einmal updaten
+                for line in plus_lines:
+                    canvas.itemconfig(line, fill=color)
+
+                index_dot = (index_dot + 1) % len(self.rgb_colors)
+                toast.after(16, update_color)
+
+            update_color()
+
+    def create_drei(self, main_color, size, width):
+        initial_fill = "white" if main_color == "rgb" else main_color
+
+        #drei_eck
+        simple_triangle = canvas.create_line(
+                            screen_width//2 + size, screen_height//2 + size, #linke ecke
+                            screen_width//2 - size, screen_height//2 + size, # rechte ecke
+                            screen_width//2, screen_height//2, #spitze
+                            screen_width//2 + size, screen_height//2 + size, # linke ecke
+                            width=width, fill=initial_fill
+        )
+
+        if main_color == "rgb":
+            index_dot = 0
+
+            def update_color_dot():
+                nonlocal index_dot
+                color = self.rgb_colors[index_dot]
+
+                canvas.itemconfig(simple_triangle, fill=color)
+
+                index_dot = (index_dot + 1) % len(self.rgb_colors)
+                toast.after(16, update_color_dot)
+
+            update_color_dot()
 
 
-    elif CrossPFarbe == "rgb":
-        kombiniert = CrossPGrose + CrossPGap
-        txcolorplus = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolorplus.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_plus = 0
-        def update_color_plus():
-            global index_plus
-            TextColor = txcolorplus[index_plus]
-            canvas.itemconfig(mot_id_p1, fill=TextColor)
-            canvas.itemconfig(mot_id_p2, fill=TextColor)
-            canvas.itemconfig(mot_id_p3, fill=TextColor)
-            canvas.itemconfig(mot_id_p4, fill=TextColor)
-            index_plus = (index_plus + 1) % len(txcolorplus)
-            toast.after(16, update_color_plus)
+if dot_activation == True:
+    Crosshair().create_dot(main_color=dot_color, outline_color=dot_outline, size=dot_size)
 
-        mot_id_p1 = canvas.create_line(screen_width//2 - CrossPGap, screen_height//2,   screen_width//2 - kombiniert, screen_height//2, fill="white", width=2) # links
-        mot_id_p2 = canvas.create_line(screen_width // 2, screen_height // 2 - CrossPGap, screen_width // 2, screen_height // 2 - kombiniert, fill="white", width=2) # runter
-        mot_id_p3 = canvas.create_line(screen_width // 2 + CrossPGap, screen_height // 2, screen_width // 2 + kombiniert, screen_height // 2, fill="white", width=2)  # rechts
-        mot_id_p4 = canvas.create_line(screen_width // 2, screen_height // 2 + CrossPGap, screen_width // 2, screen_height // 2 + kombiniert, fill="white", width=2)  # hoch
-        update_color_plus()
+if rectangle_activation == True:
+    Crosshair().create_rectangle(main_color=rectangle_color, outline_color=rectangle_outline, size=rectangle_size)
 
-else:
-    pass
+if x_activation == True:
+    Crosshair().create_x(main_color=x_color, size=x_size, gap_size=x_gap, width=x_width)
 
-if DreiActivation == True:
-    # dreieck
-    if CrossDreiFarbe != "rgb":
-        canvas.create_line(screen_width//2 + CrossDreiGrose, screen_height//2 + CrossDreiGrose, #linke ecke
-                           screen_width//2 - CrossDreiGrose, screen_height//2 + CrossDreiGrose, # rechte ecke
-                           screen_width//2, screen_height//2, #spitze
-                           screen_width//2 + CrossDreiGrose, screen_height//2 + CrossDreiGrose, # linke ecke
-                           width=5, fill=CrossDreiFarbe)
+if plus_activation == True:
+    Crosshair().create_plus(main_color=plus_color, size=plus_size, gap_size=plus_gap, width=plus_width)
 
-    elif CrossDreiFarbe == "rgb":
-        txcolordrei = []
-        for i in range(360):
-            h = i / 360.0
-            r, g, b = colorsys.hsv_to_rgb(h, 1, 1)
-            txcolordrei.append('#{0:02X}{1:02X}{2:02X}'.format(
-                int(r * 255), int(g * 255), int(b * 255)
-            ))
-        index_drei = 0
-        def update_color_drei():
-            global index_drei
-            TextColor = txcolordrei[index_drei]
-            canvas.itemconfig(mot_id_drei, fill=TextColor)
-            index_drei = (index_drei + 1) % len(txcolordrei)
-            toast.after(16, update_color_drei)
-
-        mot_id_drei =canvas.create_line(screen_width//2 + CrossDreiGrose, screen_height//2 + CrossDreiGrose, #linke ecke
-                           screen_width//2 - CrossDreiGrose, screen_height//2 + CrossDreiGrose, # rechte ecke
-                           screen_width//2, screen_height//2, #spitze
-                           screen_width//2 + CrossDreiGrose, screen_height//2 + CrossDreiGrose, # linke ecke
-                           width=5, fill="white")
-        update_color_drei()
-
-else:
-    pass
+if triangle_activation == True:
+    Crosshair().create_drei(main_color=triangle_color, size=triangle_size, width=triangle_width)
 
 
 def force_topmost():
-    try:
-        win32gui.SetWindowPos(
-            mainhwnd,
-            win32con.HWND_TOPMOST,
-            0, 0, 0, 0,
-            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE
-        )
-        toast.after(500, force_topmost)
-    except:
-        pass
-
+    toast.attributes("-topmost", True)
+    toast.after(500, force_topmost)
 toast.after(100, force_topmost)
+
 toast.mainloop()    

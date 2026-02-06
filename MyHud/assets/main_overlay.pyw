@@ -46,7 +46,7 @@ try:
         ]
 
 except FileNotFoundError:
-    motivation = ["stay motivated", "CoFfEEee", "I wanna Sleep", "You can win thís", "Keep Up", "RAU on Top", "Lol", "MrThaddäus war da", "Only Headshots 💀", "🦦🦦🦦🦦🦦", "keep Coding", "Grrr", "RARW"]
+    motivation = ["stay motivated", "CoFfEEee", "I wanna Sleep", "RAU ON TOP"]
 
 
 def update_spruch():
