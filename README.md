@@ -13,11 +13,11 @@ made by Phönix
 5. Done!
 
 **TIPS:**
-- You can create a shortcut to access the .exe file easily
+- You can create a shortcut to the .exe file to access it more easily
 - You can delete assets.bat and this file after installation
-- Don't move the "assets", "_internal" folders or "MyHud.exe"
-- You can edit the text in the upper right corner by writing in the "Motivation.txt" file
-- For the GIF display, you can also use .png and .jpg files, but it might crash
+- Don't move the "assets" folder or "MyHud.exe" and dont change any Files (Unless you know what you doing)
+- You can edit the text in the upper right corner by writing in the "assets/Your_Motivation_Text/motivation.txt" file
+- For the GIF display, you can also use .png and .jpg files, just put them in the "asstes/Your_Gifs" folder
 
 
 **ANY BUGS OR QUESTIONS?** <br/>
@@ -26,4 +26,4 @@ My Discord: phoenixofgame
 
 **Have Fun!** <br/>
 ~ Phönix <br/>
-26.01.2026
+24.02.2026
