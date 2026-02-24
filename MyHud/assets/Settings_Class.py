@@ -3,9 +3,6 @@ import json
 from tkinter import colorchooser
 
 
-
-
-
 class SettingsMenu:
     def __init__(self, name, main_color, secondary_color, config_file):
         self.name = name
@@ -18,14 +15,9 @@ class SettingsMenu:
         self.save_button = None
 
 
-    def create_new(self, master):
-        settings_win = customtkinter.CTkToplevel(master)
-        settings_win.title(f"{self.name} Settings ⚙️")
-        settings_win.minsize(600, 100)
-        settings_win.resizable(False, False)
-        settings_win.configure(fg_color=self.main_color)
-        settings_win.grab_set()
-        settings_win.wm_attributes("-alpha", 0.95)
+    def create_new(self, master, row):
+        settings_win = customtkinter.CTkFrame(master, corner_radius=20, fg_color=self.main_color)
+        settings_win.grid(row=row, column=0, padx=20, pady=10, sticky="ew")
 
         title = customtkinter.CTkLabel(
             settings_win,
@@ -63,7 +55,6 @@ class SettingsMenu:
             with open(self.config_file, "w", encoding="utf-8") as f:
                 json.dump(settings_data, f, indent=4, ensure_ascii=False)
 
-
             self.save_button.configure(text="✅ Saved!", fg_color="#00cc66")
             settings_win.after(
                 300,
@@ -72,7 +63,21 @@ class SettingsMenu:
                     fg_color=self.secondary_color
                 )
             )
-            settings_win.after(400, settings_win.destroy)
+
+            def do_destroy():
+                settings_win.destroy()
+                master.update()
+                if hasattr(master, '_parent_canvas'):
+                    master._parent_canvas.configure(scrollregion=master._parent_canvas.bbox("all"))
+
+            settings_win.after(
+                300,
+                lambda: self.save_button.configure(
+                    text="Save Settings",
+                    fg_color=self.secondary_color
+                )
+            )
+            settings_win.after(400, do_destroy)
 
         self.save_button = customtkinter.CTkButton(
             settings_win,

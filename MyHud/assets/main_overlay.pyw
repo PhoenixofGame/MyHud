@@ -8,6 +8,7 @@ import psutil
 import win32con
 import win32gui
 import win32process
+from ConfigManager import ConfigManager
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 
@@ -33,8 +34,32 @@ canvas = tk.Canvas(UI, width=screen_width, height=screen_height, bg="black", hig
 canvas.pack()
 
 ###############################################################################################################
+######################################      Config Laden       ################################################
+###############################################################################################################
+try:
+    main_overlay_motv_color = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_motv_color")
+    main_overlay_motv_size = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_motv_size")
+    main_overlay_clock_color = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_clock_color")
+    main_overlay_clock_size = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_clock_size")
+    main_overlay_spotify_color = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_spotify_color")
+    main_overlay_spotify_size = ConfigManager().load_from_config(config_name="config.json", name_in_config="main_overlay_spotify_size")
+
+except ValueError:
+    print("Value Error")
+    main_overlay_motv_color = "rgb"
+    main_overlay_motv_size = 15
+    main_overlay_clock_color = "white"
+    main_overlay_clock_size = 15
+    main_overlay_spotify_color = "white"
+    main_overlay_spotify_size = 15
+
+###############################################################################################################
 ######################################   Motivation anzeige    ################################################
 ###############################################################################################################
+# Konstanter Abstand zwischen den Elementen
+SPACING = -5
+start_y = 10
+
 
 try:
     config_path = os.path.join('Your_Motivation_Text/motivation.txt')
@@ -74,9 +99,21 @@ def update_color():
     UI.after(16, update_color)
 
 
-mot_id = canvas.create_text(screen_width - 10, (screen_height**-1)+10 , text="", anchor="ne", fill="#00ff9d", font=("Comic Sans MS", 15, "bold italic"))
+mot_y = start_y
+mot_id = canvas.create_text(
+    screen_width - 10,
+    mot_y,
+    text="",
+    anchor="ne",
+    fill="#00ff9d",
+    font=("Comic Sans MS", main_overlay_motv_size, "bold italic")
+)
 update_spruch()
-update_color()
+
+if main_overlay_motv_color == "rgb":
+    update_color()
+else:
+    canvas.itemconfig(mot_id, fill=main_overlay_motv_color)
 
 
 ###############################################################################################################
@@ -87,9 +124,31 @@ def update_clock():
     canvas.itemconfig(uhr_id, text=aktuelle_zeit)
     UI.after(1000, update_clock)
 
-uhr_id = canvas.create_text(screen_width - 10, (screen_height**-1)+30,text="--:--:--",font=("Comic Sans MS", 15, "italic"),fill="white", anchor="ne")
+def update_color2():
+    global index
+    TextColor = txcolor[index]
+    canvas.itemconfig(uhr_id, fill=TextColor)
+    index = (index + 1) % len(txcolor)
+    UI.after(16, update_color2)
+
+mot_bbox = canvas.bbox(mot_id)
+mot_height = mot_bbox[3] - mot_bbox[1] if mot_bbox else main_overlay_motv_size
+
+uhr_y = mot_y + mot_height + SPACING
+uhr_id = canvas.create_text(
+    screen_width - 10,
+    uhr_y,
+    text="--:--:--",
+    font=("Comic Sans MS", main_overlay_clock_size, "italic"),
+    fill="white",
+    anchor="ne"
+)
 update_clock()
 
+if main_overlay_clock_color == "rgb":
+    update_color2()
+else:
+    canvas.itemconfig(uhr_id, fill=main_overlay_clock_color)
 ###############################################################################################################
 ######################################   Spotify anzeige    ###################################################
 ###############################################################################################################
@@ -120,10 +179,31 @@ def update_spotify_text():
 
     UI.after(2000, update_spotify_text)
 
-spotify_id = canvas.create_text(screen_width - 10, (screen_height**-1)+50,text="",font=("Comic Sans MS", 15, "italic"),fill="white", anchor="ne")
+def update_color3():
+    global index
+    TextColor = txcolor[index]
+    canvas.itemconfig(spotify_id, fill=TextColor)
+    index = (index + 1) % len(txcolor)
+    UI.after(16, update_color3)
+
+uhr_bbox = canvas.bbox(uhr_id)
+uhr_height = uhr_bbox[3] - uhr_bbox[1] if uhr_bbox else main_overlay_clock_size
+
+spotify_y = uhr_y + uhr_height + SPACING
+spotify_id = canvas.create_text(
+    screen_width - 10,
+    spotify_y,
+    text="",
+    font=("Comic Sans MS", main_overlay_spotify_size, "italic"),
+    fill="white",
+    anchor="ne"
+)
 update_spotify_text()
 
-
+if main_overlay_spotify_color == "rgb":
+    update_color3()
+else:
+    canvas.itemconfig(spotify_id, fill=main_overlay_spotify_color)
 
 # ende
 def force_topmost2():

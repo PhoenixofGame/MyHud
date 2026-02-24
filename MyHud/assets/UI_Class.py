@@ -12,9 +12,12 @@ class UiClass:
         self.secondary_color = secondary_color
         self.text_color = text_color
 
-    def create_module(self, master, command_main, command_second, hover_color, label_text):
+    def create_module(self, master, command_main, command_second, hover_color, label_text, row):
+        for widget in master.grid_slaves(row=row):
+            widget.destroy()
+
         self.frame = customtkinter.CTkFrame(master, corner_radius=20, fg_color=self.main_color)
-        self.frame.pack(fill="x", padx=40, pady=10)
+        self.frame.grid(row=row, column=0, padx=20, pady=10, sticky="ew")
 
         self.label = customtkinter.CTkLabel(
             self.frame, text=label_text, font=("Comic Sans MS", 42, "bold"), text_color=self.text_color)

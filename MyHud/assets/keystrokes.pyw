@@ -69,7 +69,7 @@ class Keys:
 
         if self.is_mouse:
             # Mouse Listener
-            def on_click(x, y, button, pressed):
+            def on_click(button, pressed):
                 button_map = {
                     "lmb": mouse.Button.left,
                     "rmb": mouse.Button.right,

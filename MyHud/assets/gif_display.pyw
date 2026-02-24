@@ -93,7 +93,6 @@ class GifOverlay:
         self.UI_Gif.mainloop()
 
 
-# Verwendung
-if __name__ == "__main__":
-    overlay = GifOverlay("gif_config.json")
-    overlay.start()
+
+overlay = GifOverlay("gif_config.json")
+overlay.start()
