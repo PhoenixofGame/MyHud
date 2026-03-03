@@ -1,7 +1,7 @@
 import customtkinter
 
 class UiClass:
-    def __init__(self, name, main_color, secondary_color, text_color):
+    def __init__(self, name, main_color, text_color):
         self.name = name
         self.label = name + "_label"
         self.frame = name + "_frame"
@@ -9,7 +9,6 @@ class UiClass:
         self.main_button = name + "_main_button"
         self.save_button = name + "_save_button"
         self.main_color = main_color
-        self.secondary_color = secondary_color
         self.text_color = text_color
 
     def create_module(self, master, command_main, command_second, hover_color, label_text, row):

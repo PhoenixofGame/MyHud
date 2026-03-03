@@ -4,11 +4,12 @@ from tkinter import colorchooser
 
 
 class SettingsMenu:
-    def __init__(self, name, main_color, secondary_color, config_file):
+    def __init__(self, name, main_color, secondary_color, hover_color, config_file):
         self.name = name
         self.main_color = main_color
         self.secondary_color = secondary_color
         self.config_file = config_file
+        self.hover_color = hover_color
 
         self.entries = []
         self.frame = None
@@ -84,7 +85,7 @@ class SettingsMenu:
             text="Save Settings",
             font=("Comic Sans MS", 25, "bold"),
             fg_color=self.secondary_color,
-            hover_color=self.secondary_color,
+            hover_color=self.hover_color,
             text_color="black",
             command=save_settings
         )

@@ -57,6 +57,7 @@ class GifSetting:
                 command=lambda d=datei: self.toggle_button(d),
                 anchor="w",
                 fg_color="red",
+                hover_color= "#450000"
             )
             btn.pack(fill="x", pady=2, padx=5)
 
@@ -112,7 +113,7 @@ class GifSetting:
         # Zustand umschalten
         if button_info["aktiv"]:
             # Deaktivieren
-            button.configure(fg_color="red")
+            button.configure(fg_color="red", hover_color="#450000")
 
             if dateiname in self.hold_containers:
                 self.hold_containers[dateiname].destroy()
@@ -139,7 +140,7 @@ class GifSetting:
             button_info["aktiv"] = False
         else:
             # Aktivieren
-            button.configure(fg_color="green")
+            button.configure(fg_color="green", hover_color="#006300")
 
             # Config laden
             current_config = self.load_gif_config(dateiname)
