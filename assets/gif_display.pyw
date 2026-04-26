@@ -14,7 +14,6 @@ class GifOverlay:
 
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
-        # ===========================OVERLAY===========================
         self.UI_Gif = tk.Tk()
         self.UI_Gif.attributes("-topmost", True)
         self.UI_Gif.attributes("-transparentcolor", "black") # noqa
