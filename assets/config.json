@@ -3,7 +3,7 @@
     "counter_process_save": false,
     "title_process_save": false,
     "gif_process_save": false,
-    "title_default_text": "www",
+    "title_default_text": "placeholder",
     "title_color": "rgb",
     "title_size": 45,
     "overlay_process_save": true,

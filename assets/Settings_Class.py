@@ -1,6 +1,11 @@
 import customtkinter
-import json
 from tkinter import colorchooser
+
+try:
+    from assets.ConfigManager import ConfigManager  # Als EXE / von außen
+except ImportError:
+    from ConfigManager import ConfigManager  # Als .pyw im assets Ordner
+
 
 
 class SettingsMenu:
@@ -31,15 +36,8 @@ class SettingsMenu:
         self.frame = customtkinter.CTkFrame(settings_win, fg_color="transparent")
         self.frame.pack(pady=10, fill="x", padx=30)
 
+        # NACHHER:
         def save_settings():
-            # bestehende JSON laden
-            try:
-                with open(self.config_file, "r", encoding="utf-8") as f:
-                    settings_data = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                settings_data = {}
-
-            # Entries speichern (typisiert)
             for entry in self.entries:
                 raw_value = entry["widget"].get().strip()
                 if not raw_value:
@@ -51,10 +49,7 @@ class SettingsMenu:
                     print(f"Ungültiger Wert für {entry['label']}: {raw_value}")
                     continue
 
-                settings_data[entry["label"]] = value
-
-            with open(self.config_file, "w", encoding="utf-8") as f:
-                json.dump(settings_data, f, indent=4, ensure_ascii=False)
+                ConfigManager().save_to_config(self.config_file, entry["label"], value)
 
             self.save_button.configure(text="✅ Saved!", fg_color="#00cc66")
             settings_win.after(

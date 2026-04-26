@@ -10,6 +10,8 @@ from assets.gif_settings import GifSetting
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
+cleanup_done = False
+
 # ============ Farben & Themes ============
 BG_COLOR = "black"
 MAIN_COLOR = "grey"
@@ -18,16 +20,38 @@ ACCENT_COLOR = "#cfcccc"
 ACCENT_HOVER = "white"
 INVIS_COLOR = "#000001"
 
+def start_sub(script_name):
+    if getattr(sys, 'frozen', False):
+        base = os.path.dirname(sys.executable)
+        return subprocess.Popen([os.path.join(base, "assets", f"{script_name}.exe")])
+    else:
+        return subprocess.Popen(["pythonw", os.path.join("assets", f"{script_name}.pyw")])
+
+def kill_sub(exe_name, pyw_process):
+    if getattr(sys, 'frozen', False):
+        # Läuft als EXE → taskkill per Name
+        subprocess.call(["taskkill", "/F", "/IM", exe_name], creationflags=subprocess.CREATE_NO_WINDOW)
+    else:
+        # Läuft als .pyw → terminate über das Prozess-Objekt
+        if pyw_process and pyw_process.poll() is None:
+            pyw_process.terminate()
+            pyw_process.wait(timeout=2)
+
 
 # ============ Cleanup-Funktion ============
 def cleanup_and_exit():
-    global crosshair_process, crosshair_process_save, titel_process, title_process_save, gif_process, gif_process_save,key_process, key_process_save, overlay_process, overlay_process_save, counter_process, counter_process_save
+    global cleanup_done, crosshair_process, crosshair_process_save, titel_process, title_process_save, gif_process, gif_process_save,key_process, key_process_save, overlay_process, overlay_process_save, counter_process, counter_process_save
 
-    # Alle Subprozesse beenden
-    for process in [crosshair_process, titel_process, gif_process,key_process, overlay_process, counter_process]:
-        if process and hasattr(process, 'poll') and process.poll() is None:
-            process.terminate()
-            process.wait(timeout=2)
+    if cleanup_done:
+        return
+    cleanup_done = True
+
+    kill_sub("crosshair.exe", crosshair_process)
+    kill_sub("text_display.exe", titel_process)
+    kill_sub("gif_display.exe", gif_process)
+    kill_sub("keystrokes.exe", key_process)
+    kill_sub("main_overlay.exe", overlay_process)
+    kill_sub("counter.exe", counter_process)
 
     ConfigManager().save_to_config("assets/config.json", "crosshair_process_save", status=crosshair_process_save)
     ConfigManager().save_to_config("assets/config.json", "title_process_save", status=title_process_save)
@@ -96,10 +120,10 @@ holder.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
 def CrosshairSwitch():
     global crosshair_process, crosshair_process_save
     if Crosshair.main_button.get():
-        crosshair_process = subprocess.Popen(["pythonw", os.path.join("assets", "crosshair.pyw")])
+        crosshair_process = start_sub("crosshair")
         crosshair_process_save = True
     else:
-        crosshair_process.terminate()
+        kill_sub("crosshair.exe", crosshair_process)
         crosshair_process = None
         crosshair_process_save = False
 
@@ -264,10 +288,10 @@ def CrosshairSettings():
 def TitelSwitch():
     global titel_process, title_process_save
     if Titel_anzeige.main_button.get():
-        titel_process = subprocess.Popen(["pythonw", os.path.join("assets", "text_display.pyw")])
+        titel_process = start_sub("text_display")
         title_process_save = True
     else:
-        titel_process.terminate()
+        kill_sub("text_display.exe", titel_process)
         titel_process = None
         title_process_save = False
 
@@ -285,10 +309,10 @@ def TitelSettings():
 def GifSwitch():
     global gif_process, gif_process_save
     if Gif_anzeige.main_button.get():
-        gif_process = subprocess.Popen(["pythonw", os.path.join("assets", "gif_display.pyw")])
+        gif_process = start_sub("gif_display")
         gif_process_save = True
     else:
-        gif_process.terminate()
+        kill_sub("gif_display.exe", gif_process)
         gif_process = None
         gif_process_save = False
 
@@ -298,10 +322,10 @@ def GifSettings():
 def KeySwitch():
     global key_process, key_process_save
     if Key_anzeige.main_button.get():
-        key_process = subprocess.Popen(["pythonw", os.path.join("assets", "keystrokes.pyw")])
+        key_process = start_sub("keystrokes")
         key_process_save = True
     else:
-        key_process.terminate()
+        kill_sub("keystrokes.exe", key_process)
         key_process = None
         key_process_save = False
 
@@ -326,15 +350,13 @@ def KeySettings():
     key_settings.add_entry("key_text_font", f"Set the Key Font. ", placeholder= f"(Current: {key_text_font})")
     key_settings.add_entry("key_text_size", f"Set the Font Size. ", placeholder= f"(Current: {key_text_size})", value_type=int)
 
-
-
 def UiSwitch():
     global overlay_process, overlay_process_save
     if Main_Ui.main_button.get():
-        overlay_process = subprocess.Popen(["pythonw", os.path.join("assets", "main_overlay.pyw")])
+        overlay_process = start_sub("main_overlay")
         overlay_process_save = True
     else:
-        overlay_process.terminate()
+        kill_sub("main_overlay.exe", overlay_process)
         overlay_process = None
         overlay_process_save = False
 
@@ -360,10 +382,10 @@ def UiSettings():
 def CounterSwitch():
     global counter_process, counter_process_save
     if Counter.main_button.get():
-        counter_process = subprocess.Popen(["pythonw", os.path.join("assets", "counter.pyw")])
+        counter_process = start_sub("counter")
         counter_process_save = True
     else:
-        counter_process.terminate()
+        kill_sub("counter.exe", counter_process)
         counter_process = None
         counter_process_save = False
 
@@ -414,17 +436,17 @@ Counter.create_module(holder, CounterSwitch, CounterSettings, hover_color= ACCEN
 def auto_start(save_process, button, process, script):
     if save_process:
         button.main_button.select()
-        process = subprocess.Popen(["pythonw", os.path.join("assets", script)])
+        process = start_sub(script)
     elif not save_process:
         process = None
     return process
 
-crosshair_process = auto_start(crosshair_process_save, Crosshair, "crosshair_process", "crosshair.pyw")
-titel_process = auto_start(title_process_save, Titel_anzeige, "titel_process", "text_display.pyw")
-gif_process = auto_start(gif_process_save, Gif_anzeige, "gif_process", "gif_display.pyw")
-key_process = auto_start(key_process_save, Key_anzeige, "key_process", "keystrokes.pyw")
-overlay_process = auto_start(overlay_process_save, Main_Ui, "overlay_process", "main_overlay.pyw")
-counter_process = auto_start(counter_process_save, Counter, "counter_process", "counter.pyw")
+crosshair_process = auto_start(crosshair_process_save, Crosshair, "crosshair_process", "crosshair")
+titel_process = auto_start(title_process_save, Titel_anzeige, "titel_process", "text_display")
+gif_process = auto_start(gif_process_save, Gif_anzeige, "gif_process", "gif_display")
+key_process = auto_start(key_process_save, Key_anzeige, "key_process", "keystrokes")
+overlay_process = auto_start(overlay_process_save, Main_Ui, "overlay_process", "main_overlay")
+counter_process = auto_start(counter_process_save, Counter, "counter_process", "counter")
 
 # ======================================================
 # ===================  toggle  =========================
@@ -438,10 +460,10 @@ def toggle_window():
         main.withdraw()
 
 keyboard.add_hotkey("right shift", toggle_window)
-
+keyboard.add_hotkey("f3", lambda: threading.Thread(target=cleanup_and_exit, daemon=True).start())
 
 if __name__ == "__main__":
     try:
         main.mainloop()
-    except KeyboardInterrupt:
-        cleanup_and_exit()
+    finally:
+        cleanup_and_exit()  # ← wird IMMER aufgerufen wenn mainloop endet
