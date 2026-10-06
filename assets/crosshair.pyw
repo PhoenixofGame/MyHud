@@ -11,7 +11,6 @@ os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 try:
     dot_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_color")
-    dot_outline = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_outline")
     dot_size = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="dot_size")
     rectangle_color = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_color")
     rectangle_outline = ConfigManager().load_from_config(config_name="crosshair_config.json", name_in_config="rectangle_outline")
@@ -36,7 +35,6 @@ try:
 except ValueError:
     print("Value Error")
     dot_color = "white"
-    dot_outline = "blue"
     dot_size = 2.5
     rectangle_color = "white"
     rectangle_outline = "black"
@@ -61,7 +59,6 @@ except ValueError:
 except FileNotFoundError:
     print("Config Not Found Error")
     dot_color = "white"
-    dot_outline = "blue"
     dot_size = 2.5
     rectangle_color = "white"
     rectangle_outline = "black"
@@ -143,36 +140,40 @@ class Crosshair:
                 int(r * 255), int(g * 255), int(b * 255)
             ))
 
-    def create_dot(self, main_color, outline_color, size):
-        # Bestimme Anfangsfarben
+    def create_dot(self, main_color, size):
         initial_fill = "white" if main_color == "rgb" else main_color
-        initial_outline = "white" if outline_color == "rgb" else outline_color
 
-        # Erstelle den Dot
-        simpel_dot = canvas.create_oval(
-            screen_width // 2 - size,
-            screen_height // 2 - size,
-            screen_width // 2 + size,
-            screen_height // 2 + size,
-            fill=initial_fill,
-            outline=initial_outline
-        )
+        size = int(round(size))
 
-        # Nur wenn RGB benötigt wird, starte Animation
-        if main_color == "rgb" or outline_color == "rgb":
+        cx = screen_width // 2
+        cy = screen_height // 2
+
+        d = size * 2
+        img = tk.PhotoImage(master=canvas, width=d, height=d)
+        r = size - 0.5
+        pixels = [(x, y) for y in range(d) for x in range(d)
+                  if (x - r) ** 2 + (y - r) ** 2 <= size ** 2]
+
+        def paint(color):
+            for x, y in pixels:
+                img.put(color, to=(x, y))
+
+        paint(initial_fill)
+        simpel_dot = canvas.create_image(cx, cy, image=img, anchor="center")
+
+        print(canvas.bbox(simpel_dot), img.width(), img.height())
+        canvas.tag_raise(simpel_dot)
+
+        canvas.dot_img = img  # Referenz halten
+
+        if main_color == "rgb":
             index_dot = 0
 
             def update_color_dot():
                 nonlocal index_dot
-                color = self.rgb_colors[index_dot]
-
-                if main_color == "rgb":
-                    canvas.itemconfig(simpel_dot, fill=color)
-                if outline_color == "rgb":
-                    canvas.itemconfig(simpel_dot, outline=color)
-
+                paint(self.rgb_colors[index_dot])
                 index_dot = (index_dot + 1) % len(self.rgb_colors)
-                toast.after(16, update_color_dot) # noqa
+                toast.after(16, update_color_dot)  # noqa
 
             update_color_dot()
 
@@ -291,7 +292,7 @@ class Crosshair:
 
 
 if dot_activation == True:
-    Crosshair().create_dot(main_color=dot_color, outline_color=dot_outline, size=dot_size)
+    Crosshair().create_dot(main_color=dot_color, size=dot_size)
 
 if rectangle_activation == True:
     Crosshair().create_rectangle(main_color=rectangle_color, outline_color=rectangle_outline, size=rectangle_size)

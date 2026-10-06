@@ -130,12 +130,10 @@ def CrosshairSwitch():
 def CrosshairSettings():
     def crosshair_dot_settings():
         dot_color = ConfigManager().load_from_config("assets/crosshair_config.json", "dot_color")
-        dot_outline = ConfigManager().load_from_config("assets/crosshair_config.json", "dot_outline")
         dot_size = ConfigManager().load_from_config("assets/crosshair_config.json", "dot_size")
         crosshair_settings = SettingsMenu("DoT", main_color=MAIN_COLOR, secondary_color=ACCENT_COLOR,hover_color=ACCENT_HOVER, config_file="assets/crosshair_config.json")
         crosshair_settings.create_new(crosshair_menu, 1)
         crosshair_settings.add_color_picker(text="Set the Crosshair Color: ", default_color=dot_color, save_variable="dot_color")
-        crosshair_settings.add_color_picker(text="Set the Outline Color: ", default_color=dot_outline, save_variable="dot_outline")
         crosshair_settings.add_entry("dot_size", text= "Set the Crosshair Size: ", placeholder= f"(Current: {dot_size})" , value_type=float)
 
     def crosshair_dot_main():
