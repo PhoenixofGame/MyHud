@@ -30,5 +30,8 @@
     "counter_hotkey_positive": "r",
     "counter_hotkey_negative": "T",
     "counter_x_location": 500,
-    "counter_y_location": 100
+    "counter_y_location": 100,
+    "color_preset": "Cyberpunk",
+    "design_font": "Sitka",
+    "fullscreen": "False"
 }

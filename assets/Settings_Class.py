@@ -1,43 +1,42 @@
 import customtkinter
+import threading
 from tkinter import colorchooser
 
 try:
-    from assets.ConfigManager import ConfigManager  # Als EXE / von außen
+    from assets.Config_Manager import ConfigManager
 except ImportError:
-    from ConfigManager import ConfigManager  # Als .pyw im assets Ordner
-
+    from Config_Manager import ConfigManager
 
 
 class SettingsMenu:
-    def __init__(self, name, main_color, secondary_color, hover_color, config_file):
+    def __init__(self, name, font, config_file):
         self.name = name
-        self.main_color = main_color
-        self.secondary_color = secondary_color
         self.config_file = config_file
-        self.hover_color = hover_color
+        self.font = font
+
+        self.settings_win = None
 
         self.entries = []
         self.frame = None
         self.save_button = None
 
 
-    def create_new(self, master, row):
-        settings_win = customtkinter.CTkFrame(master, corner_radius=20, fg_color=self.main_color)
-        settings_win.grid(row=row, column=0, padx=20, pady=10, sticky="ew")
+    def create_new(self, master, restart_func):
+        self.settings_win = customtkinter.CTkFrame(master, corner_radius=20, width=1230)
+        self.settings_win.pack(pady=10, fill="x", padx=30)
 
         title = customtkinter.CTkLabel(
-            settings_win,
+            self.settings_win,
             text=f"⚙️ {self.name} Settings",
-            font=("Comic Sans MS", 30, "bold"),
-            text_color=self.secondary_color
+            font=(self.font, 30, "bold"),
         )
         title.pack(pady=20)
 
-        self.frame = customtkinter.CTkFrame(settings_win, fg_color="transparent")
+        self.frame = customtkinter.CTkFrame(self.settings_win, fg_color="transparent")
         self.frame.pack(pady=10, fill="x", padx=30)
 
-        # NACHHER:
         def save_settings():
+
             for entry in self.entries:
                 raw_value = entry["widget"].get().strip()
                 if not raw_value:
@@ -51,37 +50,29 @@ class SettingsMenu:
 
                 ConfigManager().save_to_config(self.config_file, entry["label"], value)
 
+            if restart_func is not None:
+                threading.Thread(target=restart_func, daemon=True).start()
+
             self.save_button.configure(text="✅ Saved!", fg_color="#00cc66")
-            settings_win.after(
+            self.settings_win.after(
                 300,
                 lambda: self.save_button.configure(
                     text="Save Settings",
-                    fg_color=self.secondary_color
                 )
             ) # noqa
 
-            def do_destroy():
-                settings_win.destroy()
-                master.update()
-                if hasattr(master, '_parent_canvas'):
-                    master._parent_canvas.configure(scrollregion=master._parent_canvas.bbox("all")) # noqa
-
-            settings_win.after(
+            self.settings_win.after(
                 300,
                 lambda: self.save_button.configure(
                     text="Save Settings",
-                    fg_color=self.secondary_color
                 )
             ) # noqa
-            settings_win.after(400, do_destroy) # noqa
+
 
         self.save_button = customtkinter.CTkButton(
-            settings_win,
+            self.settings_win,
             text="Save Settings",
-            font=("Comic Sans MS", 25, "bold"),
-            fg_color=self.secondary_color,
-            hover_color=self.hover_color,
-            text_color="black",
+            font=(self.font, 25, "bold"),
             command=save_settings
         )
         self.save_button.pack(pady=20)
@@ -90,10 +81,7 @@ class SettingsMenu:
         if not self.frame:
             return None
 
-        # Standardfarbe für den Button
         current_color = default_color
-
-        # Prüfe ob default_color RGB ist (beginnt mit "rgb(")
         if default_color == "rgb":
             is_rgb = True
         else:
@@ -101,20 +89,18 @@ class SettingsMenu:
 
         def choose_color():
             nonlocal current_color
-            # askcolor gibt ein Tuple zurück: ((r,g,b), "#hexcode")
             color = colorchooser.askcolor(title="Choose color")
-            if color[1]:  # Wenn eine Farbe gewählt wurde (nicht abgebrochen)
+            if color[1]:
                 current_color = color[1]
                 button.configure(fg_color=current_color)
 
-        # Container Frame für Button und Label
         container = customtkinter.CTkFrame(self.frame, fg_color="transparent")
         container.pack(pady=8, fill="x")
 
         label = customtkinter.CTkLabel(
             container,
             text=text,
-            font=("Comic Sans MS", 20, "bold"),
+            font=(self.font, 20, "bold"),
         )
         label.pack(side="left")
 
@@ -124,7 +110,7 @@ class SettingsMenu:
                 text="Toggle RGB",
                 switch_width=40,
                 switch_height=20,
-                font=("Comic Sans MS", 20, "bold"),
+                font=(self.font, 20, "bold"),
             )
             rgb_switch.pack(side="right", padx=(10, 10))
 
@@ -134,14 +120,12 @@ class SettingsMenu:
             width=40,
             height=40,
             command=choose_color,
-            fg_color=current_color if not is_rgb else "red",  # Fallback für RGB
+            fg_color=current_color if not is_rgb else "red",
             border_width=2,
-            border_color="white",
             hover_color=current_color if not is_rgb else "red",
         )
         button.pack(side="right", padx=(10, 10))
 
-        # Switch auf "on" setzen wenn default RGB ist
         if show_rgb:
             if is_rgb:
                 rgb_switch.select()
@@ -174,24 +158,22 @@ class SettingsMenu:
         if not self.frame:
             return None
 
-        # Container Frame für Button und Label
         container = customtkinter.CTkFrame(self.frame, fg_color="transparent")
         container.pack(pady=8, fill="x")
 
         label = customtkinter.CTkLabel(
             container,
             text=text,
-            font=("Comic Sans MS", 20, "bold"),
+            font=(self.font, 20, "bold"),
         )
-        label.pack(side="left")
+        label.pack(side="left", padx=(0, 10))
 
         entry = customtkinter.CTkEntry(
             container,
-            fg_color="#ffffff",
-            text_color="#000000",
-            placeholder_text=str(placeholder)
+            placeholder_text=str(placeholder),
+            width=450
         )
-        entry.pack(side="right", fill="x", expand=True, padx=(10, 0))
+        entry.pack(side="right")
 
         self.entries.append({
             "label": entry_name,
@@ -200,6 +182,93 @@ class SettingsMenu:
         })
 
         return entry
+
+    def add_switch(self, switch_text, save_stuff, saved_status):
+        if not self.frame:
+            return None
+
+        container = customtkinter.CTkFrame(self.frame, fg_color="transparent")
+        container.pack(pady=8, fill="x")
+
+        label = customtkinter.CTkLabel(
+            container,
+            text=switch_text,
+            font=(self.font, 20, "bold"),
+        )
+        label.pack(side="left", padx=(0, 10))
+
+        switch = customtkinter.CTkSwitch(
+            container,
+            text="",
+            corner_radius=50,
+            switch_width=90,  # Breite des Switches
+            switch_height=40,  # Höhe des Switches
+            fg_color="red",  # Farbe wenn AUS
+            progress_color="green",  # Farbe wenn AN
+            border_width=3,
+        )
+        switch.pack(side="right", padx=(10, 0))
+
+        if saved_status == "True":
+            switch.select()
+
+        class switch_toggle:
+            def __init__(self, switch_in):
+                self.switch_in = switch_in
+
+            def get(self):
+                if self.switch_in.get() == 1:
+                    return "True"
+                else:
+                    return "False"
+
+        switch_out = switch_toggle(switch)
+
+        self.entries.append({
+            "label": save_stuff,
+            "widget": switch_out,
+            "type": str
+        })
+
+        return switch
+
+    def add_dropdown(self, dropdown_name, text, options, saved_value=None):
+        if not self.frame:
+            return None
+
+        container = customtkinter.CTkFrame(self.frame, fg_color="transparent")
+        container.pack(pady=8, fill="x")
+
+        label = customtkinter.CTkLabel(
+            container,
+            text=text,
+            font=(self.font, 20, "bold"),
+        )
+        label.pack(side="left", padx=(0, 10))
+
+        dropdown = customtkinter.CTkOptionMenu(
+            container,
+            values=options,
+            font=(self.font, 18, "bold"),
+            text_color="#000000",
+            dropdown_text_color="#000000",
+            dropdown_hover_color="#dddddd",
+            width=450,
+        )
+        dropdown.pack(side="right")
+
+        if saved_value and saved_value in options:
+            dropdown.set(saved_value)
+        elif options:
+            dropdown.set(options[0])
+
+        self.entries.append({
+            "label": dropdown_name,
+            "widget": dropdown,
+            "type": str
+        })
+
+        return dropdown
 
     def get_entry_value(self, entry_name):
         for entry in self.entries:
@@ -210,4 +279,21 @@ class SettingsMenu:
                 except ValueError:
                     return None
         return None
+
+    def destroy(self, master):
+        def do_destroy():
+            for entry in self.entries:
+                widget = entry["widget"]
+                if isinstance(widget, customtkinter.CTkOptionMenu):
+                    try:
+                        widget._close_dropdown_menu()
+                    except Exception:
+                        pass
+            self.settings_win.destroy()
+            master.update()
+            if hasattr(master, '_parent_canvas'):
+                master._parent_canvas.configure(scrollregion=master._parent_canvas.bbox("all"))  # noqa
+
+        do_destroy()
+
 

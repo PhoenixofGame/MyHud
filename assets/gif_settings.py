@@ -1,86 +1,100 @@
 import json
 import customtkinter as ctk
 import os
+from pynput import keyboard
+
+try:
+    from assets.Config_Manager import ConfigManager
+except ImportError:
+    from Config_Manager import ConfigManager
+
+cm = ConfigManager()
+
+
+def key_to_str(key):
+    if isinstance(key, keyboard.Key):
+        return key.name
+    if isinstance(key, keyboard.KeyCode) and key.char:
+        return key.char.lower()
+    return None
 
 
 class GifSetting:
-    def __init__(self, master, name, config_file):
+    def __init__(self, name, font, config_file):
         self.name = name
+        self.font = font
         self.config_file = config_file
+        self.restart_func = None
 
-        self.test = ctk.CTkToplevel(master)
-        self.test.attributes("-topmost", True)
-        self.test.geometry("700x500")
-        self.test.title("Gif Settings")
-        self.test.configure(fg_color="black")
-        self.test.wm_attributes("-alpha", 0.95)
-        self.test.resizable(False, False)
+        self.root = None
+        self.entries = []
 
-        # Dictionary um Button-Zustände und Labels zu speichern
         self.aktive_buttons = {}
         self.hold_containers = {}
-        self.entry_widgets = {}  # Speichert alle Entry-Widgets
-        self.save_buttons = {}  # NEU: Speichert alle Save-Buttons separat
+        self.entry_widgets = {}
+        self.save_buttons = {}
 
-        container_titel = ctk.CTkLabel(self.test, fg_color="transparent", height=50, text="Gif Settings",
-                                       font=("Comic Sans MS", 40, "bold"))
-        container_titel.pack(side="top", fill="x", padx=5, pady=(5, 0))
+    def create_new(self, master, restart_func):
+        self.restart_func = restart_func
+        self.aktive_buttons = {}
+        self.hold_containers = {}
+        self.entry_widgets = {}
+        self.save_buttons = {}
 
-        self.container_a = ctk.CTkFrame(self.test, fg_color="transparent")
-        self.container_a.pack(side="right", expand="true", fill="both", padx=(0, 5), pady=5)
+        self.root = ctk.CTkFrame(master, corner_radius=20, width=1230)
+        self.root.pack(pady=10, fill="x", padx=30)
 
-        # Scrollable Frame für die gelben Labels
-        self.scroll_frame_a = ctk.CTkScrollableFrame(self.container_a, fg_color="transparent")
-        self.scroll_frame_a.pack(fill="both", expand=True, padx=5, pady=5)
+        title = ctk.CTkLabel(self.root, text=f"⚙️ {self.name} Settings",
+                             font=(self.font, 30, "bold"))
+        title.pack(pady=20)
 
-        container_b = ctk.CTkFrame(self.test, fg_color="transparent", width=200)
+        self.build_hotkey_row()
+
+        body = ctk.CTkFrame(self.root, fg_color="transparent")
+        body.pack(fill="x", padx=10, pady=10)
+
+        container_b = ctk.CTkFrame(body, fg_color="transparent", width=250)
         container_b.pack(side="left", fill="y", padx=5, pady=5)
 
-        scroll_frame = ctk.CTkScrollableFrame(container_b, fg_color="grey")
+        scroll_frame = ctk.CTkScrollableFrame(container_b, fg_color="grey", width=230, height=300)
         scroll_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
-        # Bildformate
+        self.scroll_frame_a = ctk.CTkFrame(body, fg_color="transparent")
+        self.scroll_frame_a.pack(side="right", expand=True, fill="both", padx=5, pady=5)
+
         bild_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
+        bild_dateien = [f for f in os.listdir("Your_Gifs") if f.lower().endswith(bild_extensions)]
 
-        # Dateien aus Ordner laden
-        bild_dateien = [
-            f for f in os.listdir("assets/Your_Gifs")
-            if f.lower().endswith(bild_extensions)
-        ]
-
-        # Button für jede Bilddatei erstellen
         for datei in bild_dateien:
-            btn = ctk.CTkButton(
-                scroll_frame,
-                text=datei,
-                command=lambda d=datei: self.toggle_button(d),
-                anchor="w",
-                fg_color="red",
-                hover_color= "#450000"
-            )
+            btn = ctk.CTkButton(scroll_frame, text=datei,
+                                command=lambda d=datei: self.toggle_button(d),
+                                anchor="w", fg_color="red", hover_color="#450000")
             btn.pack(fill="x", pady=2, padx=5)
-
-            # Button im Dictionary speichern
             self.aktive_buttons[datei] = {"button": btn, "aktiv": False}
 
-        # NEUE FUNKTION: Nach dem Erstellen aller Buttons, aktivierte GIFs laden
         self.load_active_gifs()
 
+    def destroy(self, master):
+        if self.root is not None:
+            self.root.destroy()
+            self.root = None
+            master.update()
+            if hasattr(master, '_parent_canvas'):
+                master._parent_canvas.configure(scrollregion=master._parent_canvas.bbox("all"))  # noqa
+
     def load_active_gifs(self):
-        """Lädt alle aktivierten GIFs und setzt deren Buttons auf aktiv"""
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 settings_data = json.load(f)
 
             for gif_name, config in settings_data.items():
                 if config.get("enabled", False) and gif_name in self.aktive_buttons:
-                    # Button automatisch aktivieren
-                    self.toggle_button(gif_name)
+                    # restart=False: beim Öffnen des Menüs kein Overlay-Neustart
+                    self.toggle_button(gif_name, restart=False)
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
     def load_gif_config(self, gif_name):
-        """Lädt die Konfiguration für ein bestimmtes GIF"""
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 settings_data = json.load(f)
@@ -88,7 +102,6 @@ class GifSetting:
             if gif_name in settings_data:
                 return settings_data[gif_name]
             else:
-                # Standard-Werte zurückgeben
                 return {
                     "x": 0,
                     "y": 0,
@@ -105,13 +118,15 @@ class GifSetting:
                 "enabled": False
             }
 
-    def toggle_button(self, dateiname):
+    def _restart(self):
+        if self.restart_func is not None and self.root is not None:
+            self.root.after(0, self.restart_func)
+
+    def toggle_button(self, dateiname, restart=True):
         button_info = self.aktive_buttons[dateiname]
         button = button_info["button"]
 
-        # Zustand umschalten
         if button_info["aktiv"]:
-            # Deaktivieren
             button.configure(fg_color="red", hover_color="#450000")
 
             if dateiname in self.hold_containers:
@@ -124,7 +139,6 @@ class GifSetting:
             if dateiname in self.save_buttons:
                 del self.save_buttons[dateiname]
 
-            # WICHTIG: GIF in Config deaktivieren
             try:
                 with open(self.config_file, "r", encoding="utf-8") as f:
                     settings_data = json.load(f)
@@ -137,14 +151,13 @@ class GifSetting:
                     json.dump(settings_data, f, indent=4, ensure_ascii=False)
 
             button_info["aktiv"] = False
-        else:
-            # Aktivieren
-            button.configure(fg_color="green", hover_color="#006300")
 
-            # Config laden
+            if restart:
+                self._restart()
+        else:
+            button.configure(fg_color="green", hover_color="#006300")
             current_config = self.load_gif_config(dateiname)
 
-            # NEU: Direkt beim Aktivieren in Config speichern
             try:
                 with open(self.config_file, "r", encoding="utf-8") as f:
                     settings_data = json.load(f)
@@ -156,7 +169,7 @@ class GifSetting:
                 "y": current_config["y"],
                 "width": current_config["width"],
                 "height": current_config["height"],
-                "enabled": True  # Sofort auf enabled setzen
+                "enabled": True
             }
 
             with open(self.config_file, "w", encoding="utf-8") as f:
@@ -181,7 +194,6 @@ class GifSetting:
             main_frame = ctk.CTkFrame(hold_container, fg_color="transparent")
             main_frame.pack(pady=10, fill="x", padx=30)
 
-            # Entry-Widgets erstellen und in Dictionary speichern
             self.entry_widgets[dateiname] = {}
 
             # X Position
@@ -269,14 +281,12 @@ class GifSetting:
             self.entry_widgets[dateiname]["height"] = gif_size_y
 
             def save_settings(gif_name=dateiname):
-                # bestehende JSON laden
                 try:
                     with open(self.config_file, "r", encoding="utf-8") as e:
                         settings_data_2 = json.load(e)
                 except (FileNotFoundError, json.JSONDecodeError):
                     settings_data_2 = {}
 
-                # Werte aus Entry-Widgets speichern
                 settings_data_2[gif_name] = {
                     "x": int(self.entry_widgets[gif_name]["x"].get() or 0),
                     "y": int(self.entry_widgets[gif_name]["y"].get() or 0),
@@ -288,15 +298,19 @@ class GifSetting:
                 with open(self.config_file, "w", encoding="utf-8") as t:
                     json.dump(settings_data_2, t, indent=4, ensure_ascii=False)
 
-                # Den RICHTIGEN Button updaten
+                self._restart()
+
                 self.save_buttons[gif_name].configure(text="✅ Saved!", fg_color="#00cc66")
-                self.test.after(
-                    300,
-                    lambda: self.save_buttons[gif_name].configure(
-                        text="Save Settings",
-                        fg_color="white"
-                    )
-                ) # noqa
+
+                def reset_button():
+                    btn = self.save_buttons.get(gif_name)
+                    if btn is not None:
+                        try:
+                            btn.configure(text="Save Settings", fg_color="white")
+                        except Exception:
+                            pass
+
+                self.root.after(300, reset_button)  # noqa
 
             save_button = ctk.CTkButton(
                 main_frame,
@@ -309,16 +323,16 @@ class GifSetting:
             )
             save_button.pack(pady=20)
 
-            # Save-Button im Dictionary speichern
             self.save_buttons[dateiname] = save_button
 
-            # Container speichern
             self.hold_containers[dateiname] = hold_container
 
             button_info["aktiv"] = True
 
+            if restart:
+                self._restart()
+
     def get_enabled_gifs(self):
-        """Gibt eine Liste aller aktivierten GIFs mit ihren Einstellungen zurück"""
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 settings_data = json.load(f)
@@ -332,5 +346,46 @@ class GifSetting:
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
 
-    def start(self):
-        self.test.mainloop()
+    def build_hotkey_row(self):
+        current = str(cm.load_from_config("assets/config.json", "gif_drag_hotkey", default="f8"))
+        row = ctk.CTkFrame(self.root, fg_color="transparent")
+        row.pack(fill="x", padx=30, pady=(0, 10))
+
+        ctk.CTkLabel(row, text="Drag Hotkey (halten):", font=(self.font, 20, "bold")).pack(side="left")
+
+        self.hotkey_button = ctk.CTkButton(row, text=current.upper(), width=150, command=self.capture_hotkey)
+        self.hotkey_button.pack(side="right")
+
+    def capture_hotkey(self):
+        self.hotkey_button.configure(text="Taste drücken...")
+
+        def on_press(key):
+            name = key_to_str(key)
+            if name is None:
+                return None
+            try:
+                self.root.after(0, lambda: self.apply_hotkey(name))
+            except Exception:
+                pass
+            return False
+
+        keyboard.Listener(on_press=on_press).start()
+
+    def apply_hotkey(self, name):
+        if name == "esc":
+            name = str(cm.load_from_config("assets/config.json", "gif_drag_hotkey", default="f8"))
+        else:
+            cm.save_to_config("assets/config.json", "gif_drag_hotkey", name)
+            self._restart()
+        self.hotkey_button.configure(text=name.upper())
+
+    def update_position(self, name, x, y):
+        if self.root is None or name not in self.entry_widgets:
+            return
+        try:
+            for key, val in (("x", x), ("y", y)):
+                entry = self.entry_widgets[name][key]
+                entry.delete(0, "end")
+                entry.insert(0, str(val))
+        except Exception:
+            pass

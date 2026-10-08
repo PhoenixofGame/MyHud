@@ -8,7 +8,7 @@ import shutil
 
 class ConfigManager:
     def __init__(self):
-        self.appdata = os.path.join(os.environ["APPDATA"], "MyHudConfigs")
+        self.appdata = os.path.join(os.environ["APPDATA"], "FireClientNG")
         os.makedirs(self.appdata, exist_ok=True)
 
     def get_config_path(self, config_name):
@@ -18,7 +18,6 @@ class ConfigManager:
         if not os.path.exists(appdata_path):
             if getattr(sys, 'frozen', False):
                 exe_dir = os.path.dirname(sys.executable)
-                # Prüfe ob wir in assets/ sind (Sub-EXEs)
                 if os.path.basename(exe_dir).lower() == "assets":
                     exe_dir = os.path.dirname(exe_dir)
                 default = os.path.join(exe_dir, "assets", filename)
@@ -47,8 +46,16 @@ class ConfigManager:
         with open(path, 'w') as f:
             json.dump(daten, f, indent=4)
 
-    def load_from_config(self, config_name, name_in_config):
+    def load_from_config(self, config_name, name_in_config, default):
         path = self.get_config_path(config_name)
-        with open(path, 'r') as f:
-            daten = json.load(f)
-        return daten[name_in_config]
+        try:
+            with open(path, 'r') as f:
+                daten = json.load(f)
+            return daten[name_in_config]
+        except (KeyError, FileNotFoundError):
+            return default
+
+    def create_and_save(self, data, config_name):
+        path = self.get_config_path(config_name)
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=4)

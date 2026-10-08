@@ -1,0 +1,359 @@
+{
+  "CTk": {
+    "fg_color": [
+      "#1E1E1E",
+      "#1E1E1E"
+    ]
+  },
+  "CTkToplevel": {
+    "fg_color": [
+      "#1E1E1E",
+      "#1E1E1E"
+    ]
+  },
+  "CTkFrame": {
+    "corner_radius": 20,
+    "border_width": 0,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "top_fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ]
+  },
+  "CTkButton": {
+    "corner_radius": 10,
+    "border_width": 0,
+    "fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "border_color": [
+      "#606060",
+      "#606060"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkLabel": {
+    "corner_radius": 0,
+    "fg_color": "transparent",
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ]
+  },
+  "CTkEntry": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#000000",
+      "#000000"
+    ],
+    "placeholder_text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ]
+  },
+  "CTkCheckBox": {
+    "corner_radius": 6,
+    "border_width": 3,
+    "fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ],
+    "hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "checkmark_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkSwitch": {
+    "corner_radius": 1000,
+    "border_width": 3,
+    "button_length": 0,
+    "fg_color": [
+      "red",
+      "red"
+    ],
+    "progress_color": [
+      "green",
+      "green"
+    ],
+    "button_color": [
+      "#606060",
+      "#606060"
+    ],
+    "button_hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkRadioButton": {
+    "corner_radius": 1000,
+    "border_width_checked": 6,
+    "border_width_unchecked": 3,
+    "fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ],
+    "hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkProgressBar": {
+    "corner_radius": 1000,
+    "border_width": 0,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "progress_color": [
+      "#606060",
+      "#606060"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ]
+  },
+  "CTkSlider": {
+    "corner_radius": 1000,
+    "button_corner_radius": 1000,
+    "border_width": 6,
+    "button_length": 0,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "progress_color": [
+      "#383838",
+      "#383838"
+    ],
+    "button_color": [
+      "#606060",
+      "#606060"
+    ],
+    "button_hover_color": [
+      "#383838",
+      "#383838"
+    ]
+  },
+  "CTkOptionMenu": {
+    "corner_radius": 6,
+    "fg_color": [
+      "#606060",
+      "#606060"
+    ],
+    "button_color": [
+      "#383838",
+      "#383838"
+    ],
+    "button_hover_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkComboBox": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ],
+    "button_color": [
+      "#606060",
+      "#606060"
+    ],
+    "button_hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray50",
+      "gray45"
+    ]
+  },
+  "CTkScrollbar": {
+    "corner_radius": 1000,
+    "border_spacing": 4,
+    "fg_color": "transparent",
+    "button_color": [
+      "#606060",
+      "#606060"
+    ],
+    "button_hover_color": [
+      "#383838",
+      "#383838"
+    ]
+  },
+  "CTkSegmentedButton": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "selected_color": [
+      "#383838",
+      "#383838"
+    ],
+    "selected_hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "unselected_color": [
+      "#1E1E1E",
+      "#1E1E1E"
+    ],
+    "unselected_hover_color": [
+      "#606060",
+      "#606060"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
+    ]
+  },
+  "CTkTextbox": {
+    "corner_radius": 6,
+    "border_width": 0,
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "border_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ],
+    "scrollbar_button_color": [
+      "#606060",
+      "#606060"
+    ],
+    "scrollbar_button_hover_color": [
+      "#383838",
+      "#383838"
+    ]
+  },
+  "CTkScrollableFrame": {
+    "label_fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ]
+  },
+  "DropdownMenu": {
+    "fg_color": [
+      "#2D2D2D",
+      "#2D2D2D"
+    ],
+    "hover_color": [
+      "#383838",
+      "#383838"
+    ],
+    "text_color": [
+      "#E8E8E8",
+      "#E8E8E8"
+    ]
+  },
+  "CTkFont": {
+    "macOS": {
+      "family": "SF Display",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Windows": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Linux": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    }
+  }
+}
